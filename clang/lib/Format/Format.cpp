@@ -986,6 +986,7 @@ template <> struct MappingTraits<FormatStyle> {
     IO.mapOptional("ReflowComments", Style.ReflowComments);
     IO.mapOptional("RemoveBracesLLVM", Style.RemoveBracesLLVM);
     IO.mapOptional("RemoveSemicolon", Style.RemoveSemicolon);
+    IO.mapOptional("ReplaceLogicalNot", Style.ReplaceLogicalNot);
     IO.mapOptional("RequiresClausePosition", Style.RequiresClausePosition);
     IO.mapOptional("RequiresExpressionIndentation",
                    Style.RequiresExpressionIndentation);
@@ -1424,6 +1425,7 @@ FormatStyle getLLVMStyle(FormatStyle::LanguageKind Language) {
   LLVMStyle.ReflowComments = true;
   LLVMStyle.RemoveBracesLLVM = false;
   LLVMStyle.RemoveSemicolon = false;
+  LLVMStyle.ReplaceLogicalNot = false;
   LLVMStyle.RequiresClausePosition = FormatStyle::RCPS_OwnLine;
   LLVMStyle.RequiresExpressionIndentation = FormatStyle::REI_OuterScope;
   LLVMStyle.SeparateDefinitionBlocks = FormatStyle::SDS_Leave;
@@ -2126,6 +2128,44 @@ private:
         const auto Range =
             CharSourceRange::getCharRange(Start, Token->Tok.getEndLoc());
         cantFail(Result.add(tooling::Replacement(SourceMgr, Range, "")));
+      }
+    }
+  }
+};
+
+class NotReplacer : public TokenAnalyzer {
+public:
+  NotReplacer(const Environment &Env, const FormatStyle &Style)
+      : TokenAnalyzer(Env, Style) {}
+
+  std::pair<tooling::Replacements, unsigned>
+  analyze(TokenAnnotator &Annotator,
+          SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+          FormatTokenLexer &Tokens) override {
+    AffectedRangeMgr.computeAffectedLines(AnnotatedLines);
+    tooling::Replacements Result;
+    replaceNot(AnnotatedLines, Result);
+    return {Result, 0};
+  }
+
+private:
+  void replaceNot(SmallVectorImpl<AnnotatedLine *> &Lines,
+                  tooling::Replacements &Result) {
+    const auto &SourceMgr = Env.getSourceManager();
+    const auto End = Lines.end();
+    for (auto I = Lines.begin(); I != End; ++I) {
+      const auto Line = *I;
+      replaceNot(Line->Children, Result);
+      for (auto Token = Line->First; Token && !Token->Finalized;
+           Token = Token->Next) {
+        if (Token->isNot(tok::exclaim) || Token->TokenText == "not")
+          continue;
+        auto Prev = Token->getPreviousNonComment();
+        if (Prev && Prev->is(tok::kw_operator))
+          continue;
+        auto Range = CharSourceRange::getCharRange(
+            Token->getStartOfNonWhitespace(), Token->Tok.getEndLoc());
+        cantFail(Result.add(tooling::Replacement(SourceMgr, Range, "not ")));
       }
     }
   }
@@ -3420,6 +3460,7 @@ reformat(const FormatStyle &Style, StringRef Code,
   Expanded.InsertBraces = false;
   Expanded.RemoveBracesLLVM = false;
   Expanded.RemoveSemicolon = false;
+  Expanded.ReplaceLogicalNot = false;
   switch (Expanded.RequiresClausePosition) {
   case FormatStyle::RCPS_SingleLine:
   case FormatStyle::RCPS_WithPreceding:
@@ -3500,6 +3541,14 @@ reformat(const FormatStyle &Style, StringRef Code,
       S.RemoveSemicolon = true;
       Passes.emplace_back([&, S](const Environment &Env) {
         return SemiRemover(Env, S).process(/*SkipAnnotation=*/true);
+      });
+    }
+
+    if (Style.ReplaceLogicalNot) {
+      FormatStyle S = Expanded;
+      S.ReplaceLogicalNot = true;
+      Passes.emplace_back([&, S](const Environment &Env) {
+        return NotReplacer(Env, S).process(/*SkipAnnotation=*/true);
       });
     }
 

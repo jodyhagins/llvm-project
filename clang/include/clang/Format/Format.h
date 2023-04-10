@@ -3349,6 +3349,16 @@ struct FormatStyle {
   /// \version 16
   bool RemoveSemicolon;
 
+  /// Replace logical not (!) with the alternative token "not."
+  /// \code
+  ///   false:                                     true:
+  ///
+  ///   if (!flag) {                               if (not flag) {
+  ///     do_something();                            do_something();
+  ///   }                                          }
+  /// \endcode
+  bool ReplaceLogicalNot;
+
   /// \brief The possible positions for the requires clause. The
   /// ``IndentRequires`` option is only used if the ``requires`` is put on the
   /// start of a line.
@@ -4366,6 +4376,7 @@ struct FormatStyle {
            ReferenceAlignment == R.ReferenceAlignment &&
            RemoveBracesLLVM == R.RemoveBracesLLVM &&
            RemoveSemicolon == R.RemoveSemicolon &&
+           ReplaceLogicalNot == R.ReplaceLogicalNot &&
            RequiresClausePosition == R.RequiresClausePosition &&
            RequiresExpressionIndentation == R.RequiresExpressionIndentation &&
            SeparateDefinitionBlocks == R.SeparateDefinitionBlocks &&

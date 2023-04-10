@@ -25366,6 +25366,82 @@ TEST_F(FormatTest, RemoveSemicolon) {
 #endif
 }
 
+TEST_F(FormatTest, ReplaceLogicalNot) {
+  FormatStyle Style = getLLVMStyle();
+
+  verifyFormat("if (!flag) {\n"
+               "  do_something();\n"
+               "}",
+               "if (! flag) {\n"
+               "  do_something();\n"
+               "}",
+               Style);
+
+  verifyFormat("if (!flag) {\n"
+               "  do_something();\n"
+               "}",
+               "if (!flag) {\n"
+               "  do_something();\n"
+               "}",
+               Style);
+
+  verifyFormat("if (!!flag) {\n"
+               "  do_something();\n"
+               "}",
+               "if (!!flag) {\n"
+               "  do_something();\n"
+               "}",
+               Style);
+
+  verifyFormat("if (not flag) {\n"
+               "  do_something();\n"
+               "}",
+               "if (not flag) {\n"
+               "  do_something();\n"
+               "}",
+               Style);
+
+  verifyFormat("bool Foo::operator!() const { return false; }",
+               "bool Foo::operator!() const { return false; }", Style);
+
+  Style.ReplaceLogicalNot = true;
+
+  verifyFormat("if (not flag) {\n"
+               "  do_something();\n"
+               "}",
+               "if (! flag) {\n"
+               "  do_something();\n"
+               "}",
+               Style);
+
+  verifyFormat("if (not flag) {\n"
+               "  do_something();\n"
+               "}",
+               "if (!flag) {\n"
+               "  do_something();\n"
+               "}",
+               Style);
+
+  verifyFormat("if (not not flag) {\n"
+               "  do_something();\n"
+               "}",
+               "if (!!flag) {\n"
+               "  do_something();\n"
+               "}",
+               Style);
+
+  verifyFormat("if (not flag) {\n"
+               "  do_something();\n"
+               "}",
+               "if (not flag) {\n"
+               "  do_something();\n"
+               "}",
+               Style);
+
+  verifyFormat("bool Foo::operator!() const { return false; }",
+               "bool Foo::operator!() const { return false; }", Style);
+}
+
 TEST_F(FormatTest, BreakAfterAttributes) {
   FormatStyle Style = getLLVMStyle();
   EXPECT_EQ(Style.BreakAfterAttributes, FormatStyle::ABS_Never);
