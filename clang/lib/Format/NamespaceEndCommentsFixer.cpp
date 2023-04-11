@@ -141,9 +141,14 @@ std::string computeName(const FormatToken *NamespaceTok) {
 
 std::string computeEndCommentText(StringRef NamespaceName, bool AddNewline,
                                   const FormatToken *NamespaceTok,
-                                  unsigned SpacesToAdd) {
+                                  unsigned SpacesToAdd,
+                                  const std::string &Anonymous) {
   std::string text = "//";
   text.append(SpacesToAdd, ' ');
+  if (NamespaceName.empty() && !Anonymous.empty()) {
+    text += Anonymous;
+    return text;
+  }
   text += NamespaceTok->TokenText;
   if (NamespaceTok->is(TT_NamespaceMacro))
     text += "(";
@@ -162,7 +167,8 @@ bool hasEndComment(const FormatToken *RBraceTok) {
 }
 
 bool validEndComment(const FormatToken *RBraceTok, StringRef NamespaceName,
-                     const FormatToken *NamespaceTok) {
+                     const FormatToken *NamespaceTok,
+                     const std::string &Anonymous) {
   assert(hasEndComment(RBraceTok));
   const FormatToken *Comment = RBraceTok->Next;
 
@@ -191,8 +197,10 @@ bool validEndComment(const FormatToken *RBraceTok, StringRef NamespaceName,
   }
   StringRef NamespaceNameInComment = Groups.size() > 5 ? Groups[5] : "";
   // Anonymous namespace comments must not mention a namespace name.
-  if (NamespaceName.empty() && !NamespaceNameInComment.empty())
+  if (NamespaceName.empty() &&
+      (!NamespaceNameInComment.empty() || !Anonymous.empty())) {
     return false;
+  }
   StringRef AnonymousInComment = Groups.size() > 3 ? Groups[3] : "";
   // Named namespace comments must not mention anonymous namespace.
   if (!NamespaceName.empty() && !AnonymousInComment.empty())
@@ -241,6 +249,18 @@ void updateEndComment(const FormatToken *RBraceTok, StringRef EndCommentText,
     llvm::errs() << "Error while updating namespace end comment: "
                  << llvm::toString(std::move(Err)) << "\n";
   }
+}
+
+std::string Strip(std::string S) {
+  if (!S.empty()) {
+    auto n = S.find_first_not_of(" \t\n\r\v");
+    if (n > 0 && n < S.size())
+      S = S.substr(n);
+    n = S.find_last_not_of(" \t\n\r\v");
+    if (n < S.size())
+      S.resize(n + 1);
+  }
+  return S;
 }
 } // namespace
 
@@ -355,15 +375,16 @@ std::pair<tooling::Replacements, unsigned> NamespaceEndCommentsFixer::analyze(
     bool AddNewline = EndCommentNextTok &&
                       EndCommentNextTok->NewlinesBefore == 0 &&
                       EndCommentNextTok->isNot(tok::eof);
-    const std::string EndCommentText =
-        computeEndCommentText(NamespaceName, AddNewline, NamespaceTok,
-                              Style.SpacesInLineCommentPrefix.Minimum);
+    auto Anonymous = Strip(Style.AnonymousNamespaceText);
+    const std::string EndCommentText = computeEndCommentText(
+        NamespaceName, AddNewline, NamespaceTok,
+        Style.SpacesInLineCommentPrefix.Minimum, Anonymous);
     if (!hasEndComment(EndCommentPrevTok)) {
       bool isShort = I - StartLineIndex <= Style.ShortNamespaceLines + 1;
       if (!isShort)
         addEndComment(EndCommentPrevTok, EndCommentText, SourceMgr, &Fixes);
-    } else if (!validEndComment(EndCommentPrevTok, NamespaceName,
-                                NamespaceTok)) {
+    } else if (!validEndComment(EndCommentPrevTok, NamespaceName, NamespaceTok,
+                                Anonymous)) {
       updateEndComment(EndCommentPrevTok, EndCommentText, SourceMgr, &Fixes);
     }
     StartLineIndex = SIZE_MAX;
