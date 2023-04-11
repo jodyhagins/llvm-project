@@ -5403,9 +5403,14 @@ bool TokenAnnotator::canBreakBefore(const AnnotatedLine &Line,
       !Style.Cpp11BracedListStyle) {
     return false;
   }
-  if (Left.is(tok::l_paren) &&
-      Left.isOneOf(TT_AttributeParen, TT_TypeDeclarationParen)) {
-    return false;
+  if (Left.is(tok::l_paren)) {
+    if (Left.is(TT_AttributeParen)) {
+      return false;
+    }
+    if (Left.is(TT_TypeDeclarationParen) &&
+        !Style.AllowBreakAfterTypeDeclarationParen) {
+      return false;
+    }
   }
   if (Left.is(tok::l_paren) && Left.Previous &&
       (Left.Previous->isOneOf(TT_BinaryOperator, TT_CastRParen))) {
