@@ -1831,6 +1831,20 @@ struct FormatStyle {
   /// \version 3.7
   bool BreakBeforeTernaryOperators;
 
+  /// If ``true``, the function trailing return arrow will be placed after
+  /// line breaks.
+  /// \code
+  ///    true:
+  ///    auto foo(T const &t)
+  ///    -> decltype(t.foo()) {
+  ///      return t.foo();
+  ///    }
+  ///
+  ///    false:
+  ///    auto foo(T const &t) -> decltype(t.foo()) { return t.foo(); }
+  /// \endcode
+  bool BreakBeforeTrailingReturnArrow;
+
   /// Different ways to break initializers.
   enum BreakConstructorInitializersStyle : int8_t {
     /// Break constructor initializers before the colon and after the commas.
@@ -4321,6 +4335,7 @@ struct FormatStyle {
            BreakBeforeConceptDeclarations == R.BreakBeforeConceptDeclarations &&
            BreakBeforeInlineASMColon == R.BreakBeforeInlineASMColon &&
            BreakBeforeTernaryOperators == R.BreakBeforeTernaryOperators &&
+           BreakBeforeTrailingReturnArrow == R.BreakBeforeTrailingReturnArrow &&
            BreakConstructorInitializers == R.BreakConstructorInitializers &&
            BreakInheritanceList == R.BreakInheritanceList &&
            BreakStringLiterals == R.BreakStringLiterals &&
