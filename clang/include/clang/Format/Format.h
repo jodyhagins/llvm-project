@@ -3579,6 +3579,12 @@ struct FormatStyle {
     ///    #include "B/a.h"
     /// \endcode
     SI_CaseInsensitive,
+    /// Includes are sorted in an ASCIIbetical or case sensitive fashion,
+    /// ignoring the leading/trailing "" and <>.
+    SI_CaseSensitiveNameOnly,
+    /// Includes are sorted in an alphabetical or case insensitive fashion,
+    /// ignoring the leading/trailing "" and <>.
+    SI_CaseInsensitiveNameOnly,
   };
 
   /// Controls if and how clang-format will sort ``#includes``.
@@ -3587,6 +3593,12 @@ struct FormatStyle {
   /// insensitive fashion.
   /// If ``CaseSensitive``, includes are sorted in an alphabetical or case
   /// sensitive fashion.
+  /// If ``CaseInsensitiveNameOnly``, includes are sorted in an ASCIIbetical
+  /// or case insensitive fashion without enclosing double quotes or angle
+  /// brackets.
+  /// If ``CaseSensitiveNameOnly``, includes are sorted in an alphabetical
+  /// or case sensitive fashion without enclosing double quotes or angle
+  /// brackets.
   /// \version 3.8
   SortIncludesOptions SortIncludes;
 
