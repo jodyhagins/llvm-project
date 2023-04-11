@@ -491,6 +491,24 @@ struct FormatStyle {
   /// \version 3.3
   bool AllowAllParametersOfDeclarationOnNextLine;
 
+  /// Eagerly allow a break after the decltype in a long sequence of tokens.
+  ///
+  /// \code
+  ///    true:
+  ///    {
+  ///      something.first_message_sequence_number = std::numeric_limits<decltype(
+  ///          something.first_message_sequence_number)>::max();
+  ///    }
+  ///
+  ///    false:
+  ///    {
+  ///      something.first_message_sequence_number = std::numeric_limits<
+  ///          decltype(something.first_message_sequence_number)>::max();
+  ///    }
+  /// \endcode
+  ///
+  bool AllowBreakAfterTypeDeclarationParen;
+
   /// Different styles for merging short blocks containing at most one
   /// statement.
   enum ShortBlockStyle : int8_t {
@@ -4320,6 +4338,8 @@ struct FormatStyle {
            AllowAllArgumentsOnNextLine == R.AllowAllArgumentsOnNextLine &&
            AllowAllParametersOfDeclarationOnNextLine ==
                R.AllowAllParametersOfDeclarationOnNextLine &&
+           AllowBreakAfterTypeDeclarationParen ==
+               R.AllowBreakAfterTypeDeclarationParen &&
            AllowShortBlocksOnASingleLine == R.AllowShortBlocksOnASingleLine &&
            AllowShortCaseLabelsOnASingleLine ==
                R.AllowShortCaseLabelsOnASingleLine &&

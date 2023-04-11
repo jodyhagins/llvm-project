@@ -25607,6 +25607,34 @@ TEST_F(FormatTest, SpaceBeforeOverloadedOperator) {
   verifyFormat("some_object.operator ++ ();", Style);
 }
 
+TEST_F(FormatTest, AllowBreakAfterTypeDeclarationParen) {
+  FormatStyle Style = getLLVMStyle();
+
+  char const *input =
+      "{\n"
+      "  something.first_message_sequence_number = std::numeric_limits<"
+      "decltype(something.first_message_sequence_number)>::max();\n"
+      "}";
+  char const *expected =
+      "{\n"
+      "  something.first_message_sequence_number = std::numeric_limits<\n"
+      "      decltype(something.first_message_sequence_number)>::max();\n"
+      "}";
+  verifyFormat(expected,
+               input,
+               Style);
+
+  Style.AllowBreakAfterTypeDeclarationParen = true;
+  expected = "{\n"
+             "  something.first_message_sequence_number = "
+             "std::numeric_limits<decltype(\n"
+             "      something.first_message_sequence_number)>::max();\n"
+             "}";
+  verifyFormat(expected,
+               input,
+               Style);
+}
+
 } // namespace
 } // namespace test
 } // namespace format
