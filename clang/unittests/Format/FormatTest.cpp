@@ -25635,6 +25635,41 @@ TEST_F(FormatTest, AllowBreakAfterTypeDeclarationParen) {
                Style);
 }
 
+TEST_F(FormatTest, ExtraSpaceFollowingConstructorInitializers) {
+  FormatStyle Style = getLLVMStyle();
+  Style.BreakConstructorInitializers = FormatStyle::BCIS_BeforeComma;
+  EXPECT_TRUE(Style.ExtraSpaceFollowingConstructorInitializers);
+
+  char const *input = "class State\n"
+                      "{\n"
+                      "public:\n"
+                      "  State(Nanos nanos)\n"
+                      "  : period1(boost::chrono::duration_cast<duration>(\n"
+                      "      boost::chrono::nanoseconds(nanos)))\n"
+                      "  , period2(boost::chrono::duration_cast<duration>(\n"
+                      "      boost::chrono::nanoseconds(nanos)))\n"
+                      "{ }";
+
+  char const *exp = "class State {\n"
+                    "public:\n"
+                    "  State(Nanos nanos)\n"
+                    "      : period1(boost::chrono::duration_cast<duration>(\n"
+                    "            boost::chrono::nanoseconds(nanos)))\n"
+                    "      , period2(boost::chrono::duration_cast<duration>(\n"
+                    "            boost::chrono::nanoseconds(nanos))) {}";
+  verifyFormat(exp, input, Style);
+
+  Style.ExtraSpaceFollowingConstructorInitializers = false;
+  exp = "class State {\n"
+        "public:\n"
+        "  State(Nanos nanos)\n"
+        "      : period1(boost::chrono::duration_cast<duration>(\n"
+        "          boost::chrono::nanoseconds(nanos)))\n"
+        "      , period2(boost::chrono::duration_cast<duration>(\n"
+        "          boost::chrono::nanoseconds(nanos))) {}";
+  verifyFormat(exp, input, Style);
+}
+
 } // namespace
 } // namespace test
 } // namespace format

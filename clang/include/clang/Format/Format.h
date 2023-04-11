@@ -2187,6 +2187,37 @@ struct FormatStyle {
   /// \version 3.7
   bool ExperimentalAutoDetectBinPacking;
 
+  /// If ``true`` (the default), extra indention will be done following a
+  /// constructor initializer list break.  This option is most beneficial in
+  /// conjunction with BreakConstructorInitializers.  When false, the indent
+  /// will be based off the leading colon (:) and comma (,) in the initializer
+  /// list.
+  ///
+  /// \code
+  ///    Style.BreakConstructorInitializers = FormatStyle::BCIS_BeforeComma;
+  ///
+  ///    true:
+  ///    class State {
+  ///    public:
+  ///      State(Nanos nanos)
+  ///          : period1(boost::chrono::duration_cast<duration>(
+  ///                boost::chrono::nanoseconds(nanos)))
+  ///          , period2(boost::chrono::duration_cast<duration>(
+  ///                boost::chrono::nanoseconds(nanos))) {}
+  ///    };
+  ///
+  ///    false:
+  ///    class State {
+  ///    public:
+  ///      State(Nanos nanos)
+  ///          : period1(boost::chrono::duration_cast<duration>(
+  ///              boost::chrono::nanoseconds(nanos)))
+  ///          , period2(boost::chrono::duration_cast<duration>(
+  ///              boost::chrono::nanoseconds(nanos))) {}
+  ///    };
+  /// \endcode
+  bool ExtraSpaceFollowingConstructorInitializers;
+
   /// If ``true``, clang-format adds missing namespace end comments for
   /// namespaces and fixes invalid existing ones. This doesn't affect short
   /// namespaces, which are controlled by ``ShortNamespaceLines``.
@@ -4384,6 +4415,8 @@ struct FormatStyle {
            EmptyLineBeforeAccessModifier == R.EmptyLineBeforeAccessModifier &&
            ExperimentalAutoDetectBinPacking ==
                R.ExperimentalAutoDetectBinPacking &&
+           ExtraSpaceFollowingConstructorInitializers ==
+               R.ExtraSpaceFollowingConstructorInitializers &&
            FixNamespaceComments == R.FixNamespaceComments &&
            ForEachMacros == R.ForEachMacros &&
            IncludeStyle.IncludeBlocks == R.IncludeStyle.IncludeBlocks &&
