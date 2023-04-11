@@ -804,9 +804,13 @@ void ContinuationIndenter::addTokenOnCurrentLine(LineState &State, bool DryRun,
   }
 
   State.Column += Spaces;
-  if (Current.isNot(tok::comment) && Previous.is(tok::l_paren) &&
-      Previous.Previous &&
-      (Previous.Previous->is(tok::kw_for) || Previous.Previous->isIf())) {
+  if (!Style.ExtraSpaceFollowingConstructorInitializers &&
+      Previous.isOneOf(TT_CtorInitializerColon, TT_CtorInitializerComma)) {
+    // Leave the indentation alone
+  } else if (Current.isNot(tok::comment) && Previous.is(tok::l_paren) &&
+             Previous.Previous &&
+             (Previous.Previous->is(tok::kw_for) ||
+              Previous.Previous->isIf())) {
     // Treat the condition inside an if as if it was a second function
     // parameter, i.e. let nested calls have a continuation indent.
     CurrentState.LastSpace = State.Column;
