@@ -594,6 +594,10 @@ template <> struct ScalarEnumerationTraits<FormatStyle::SortIncludesOptions> {
     IO.enumCase(Value, "Never", FormatStyle::SI_Never);
     IO.enumCase(Value, "CaseInsensitive", FormatStyle::SI_CaseInsensitive);
     IO.enumCase(Value, "CaseSensitive", FormatStyle::SI_CaseSensitive);
+    IO.enumCase(Value, "CaseInsensitiveNameOnly",
+                FormatStyle::SI_CaseInsensitiveNameOnly);
+    IO.enumCase(Value, "CaseSensitiveNameOnly",
+                FormatStyle::SI_CaseSensitiveNameOnly);
 
     // For backward compatibility.
     IO.enumCase(Value, "false", FormatStyle::SI_Never);
@@ -2907,6 +2911,26 @@ std::string replaceCRLF(const std::string &Code) {
   return NewCode;
 }
 
+// Gets the name to be used for sorting, possibly removing the wrapping
+// double-quotes or angle-brackets.
+static std::string fnameForSorting(StringRef name, const FormatStyle &Style) {
+  std::string fname;
+  if (Style.SortIncludes == FormatStyle::SI_CaseInsensitive ||
+      Style.SortIncludes == FormatStyle::SI_CaseInsensitiveNameOnly) {
+    fname = name.lower();
+  } else {
+    fname.assign(name.data(), name.size());
+  }
+  if (Style.SortIncludes == FormatStyle::SI_CaseInsensitiveNameOnly ||
+      Style.SortIncludes == FormatStyle::SI_CaseSensitiveNameOnly) {
+    if (fname.size() > 1 && ((fname.front() == '"' && fname.back() == '"') ||
+                             (fname.front() == '<' && fname.back() == '>'))) {
+      fname = fname.substr(1, fname.size() - 2);
+    }
+  }
+  return fname;
+}
+
 // Sorts and deduplicate a block of includes given by 'Includes' alphabetically
 // adding the necessary replacement to 'Replaces'. 'Includes' must be in strict
 // source order.
@@ -2929,21 +2953,12 @@ static void sortCppIncludes(const FormatStyle &Style,
   SmallVector<unsigned, 16> Indices =
       llvm::to_vector<16>(llvm::seq<unsigned>(0, Includes.size()));
 
-  if (Style.SortIncludes == FormatStyle::SI_CaseInsensitive) {
-    llvm::stable_sort(Indices, [&](unsigned LHSI, unsigned RHSI) {
-      const auto LHSFilenameLower = Includes[LHSI].Filename.lower();
-      const auto RHSFilenameLower = Includes[RHSI].Filename.lower();
-      return std::tie(Includes[LHSI].Priority, LHSFilenameLower,
-                      Includes[LHSI].Filename) <
-             std::tie(Includes[RHSI].Priority, RHSFilenameLower,
-                      Includes[RHSI].Filename);
-    });
-  } else {
-    llvm::stable_sort(Indices, [&](unsigned LHSI, unsigned RHSI) {
-      return std::tie(Includes[LHSI].Priority, Includes[LHSI].Filename) <
-             std::tie(Includes[RHSI].Priority, Includes[RHSI].Filename);
-    });
-  }
+  llvm::stable_sort(Indices, [&](unsigned LHSI, unsigned RHSI) {
+    const auto lhs = fnameForSorting(Includes[LHSI].Filename, Style);
+    const auto rhs = fnameForSorting(Includes[RHSI].Filename, Style);
+    return std::tie(Includes[LHSI].Priority, lhs, Includes[LHSI].Filename) <
+           std::tie(Includes[RHSI].Priority, rhs, Includes[RHSI].Filename);
+  });
 
   // The index of the include on which the cursor will be put after
   // sorting/deduplicating.

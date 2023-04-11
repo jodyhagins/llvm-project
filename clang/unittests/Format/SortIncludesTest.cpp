@@ -670,6 +670,98 @@ TEST_F(SortIncludesTest, SupportOptionalCaseSensitiveSorting) {
             sort(UnsortedCode));
 }
 
+TEST_F(SortIncludesTest, SupportOptionalCaseInsensitiveCompleteNameSorting) {
+  Style.IncludeCategories = {};
+  FmtStyle.SortIncludes = FormatStyle::SI_CaseInsensitive;
+
+  char const *expected = "#include \"A/b.h\"\n"
+                         "#include \"a/b.h\"\n"
+                         "#include \"B/A.h\"\n"
+                         "#include \"B/a.h\"\n"
+                         "#include \"z/z.h\"\n"
+                         "#include <a/a.h>\n"
+                         "#include <A/B.h>\n";
+
+  char const *input = "#include \"B/a.h\"\n"
+                      "#include <a/a.h>\n"
+                      "#include <A/B.h>\n"
+                      "#include \"B/A.h\"\n"
+                      "#include \"a/b.h\"\n"
+                      "#include \"z/z.h\"\n"
+                      "#include \"A/b.h\"\n";
+
+  EXPECT_EQ(expected, sort(input));
+}
+
+TEST_F(SortIncludesTest, SupportOptionalCaseInsensitiveNameOnlySorting) {
+  Style.IncludeCategories = {};
+  FmtStyle.SortIncludes = FormatStyle::SI_CaseInsensitiveNameOnly;
+
+  char const *expected = "#include <a/a.h>\n"
+                         "#include \"A/b.h\"\n"
+                         "#include \"a/b.h\"\n"
+                         "#include <A/B.h>\n"
+                         "#include \"B/A.h\"\n"
+                         "#include \"B/a.h\"\n"
+                         "#include \"z/z.h\"\n";
+
+  char const *input = "#include \"B/a.h\"\n"
+                      "#include <a/a.h>\n"
+                      "#include <A/B.h>\n"
+                      "#include \"B/A.h\"\n"
+                      "#include \"a/b.h\"\n"
+                      "#include \"z/z.h\"\n"
+                      "#include \"A/b.h\"\n";
+
+  EXPECT_EQ(expected, sort(input));
+}
+
+TEST_F(SortIncludesTest, SupportOptionalCaseSensitiveCompleteNameSorting) {
+  Style.IncludeCategories = {};
+  FmtStyle.SortIncludes = FormatStyle::SI_CaseSensitive;
+
+  char const *expected = "#include \"A/b.h\"\n"
+                         "#include \"B/A.h\"\n"
+                         "#include \"B/a.h\"\n"
+                         "#include \"a/b.h\"\n"
+                         "#include \"z/z.h\"\n"
+                         "#include <A/B.h>\n"
+                         "#include <a/a.h>\n";
+
+  char const *input = "#include \"B/a.h\"\n"
+                      "#include <a/a.h>\n"
+                      "#include <A/B.h>\n"
+                      "#include \"B/A.h\"\n"
+                      "#include \"a/b.h\"\n"
+                      "#include \"z/z.h\"\n"
+                      "#include \"A/b.h\"\n";
+
+  EXPECT_EQ(expected, sort(input));
+}
+
+TEST_F(SortIncludesTest, SupportOptionalCaseSensitiveNameOnlySorting) {
+  Style.IncludeCategories = {};
+  FmtStyle.SortIncludes = FormatStyle::SI_CaseSensitiveNameOnly;
+
+  char const *expected = "#include <A/B.h>\n"
+                         "#include \"A/b.h\"\n"
+                         "#include \"B/A.h\"\n"
+                         "#include \"B/a.h\"\n"
+                         "#include <a/a.h>\n"
+                         "#include \"a/b.h\"\n"
+                         "#include \"z/z.h\"\n";
+
+  char const *input = "#include \"B/a.h\"\n"
+                      "#include <a/a.h>\n"
+                      "#include <A/B.h>\n"
+                      "#include \"B/A.h\"\n"
+                      "#include \"a/b.h\"\n"
+                      "#include \"z/z.h\"\n"
+                      "#include \"A/b.h\"\n";
+
+  EXPECT_EQ(expected, sort(input));
+}
+
 TEST_F(SortIncludesTest, SupportCaseInsensitiveMatching) {
   // Setup an regex for main includes so we can cover those as well.
   Style.IncludeIsMainRegex = "([-_](test|unittest))?$";

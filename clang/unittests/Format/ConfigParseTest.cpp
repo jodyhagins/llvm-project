@@ -814,6 +814,10 @@ TEST(ConfigParseTest, ParsesConfiguration) {
               FormatStyle::SI_CaseInsensitive);
   CHECK_PARSE("SortIncludes: CaseSensitive", SortIncludes,
               FormatStyle::SI_CaseSensitive);
+  CHECK_PARSE("SortIncludes: CaseInsensitiveNameOnly", SortIncludes,
+              FormatStyle::SI_CaseInsensitiveNameOnly);
+  CHECK_PARSE("SortIncludes: CaseSensitiveNameOnly", SortIncludes,
+              FormatStyle::SI_CaseSensitiveNameOnly);
   CHECK_PARSE("SortIncludes: Never", SortIncludes, FormatStyle::SI_Never);
 
   Style.RawStringFormats.clear();
