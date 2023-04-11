@@ -392,6 +392,8 @@ TEST(ConfigParseTest, ParsesConfiguration) {
               FormatStyle::BILS_BeforeComma);
   CHECK_PARSE("BreakInheritanceList: AfterColon", BreakInheritanceList,
               FormatStyle::BILS_AfterColon);
+  CHECK_PARSE("BreakInheritanceList: BeforeEither", BreakInheritanceList,
+              FormatStyle::BILS_BeforeEither);
   CHECK_PARSE("BreakInheritanceList: BeforeColon", BreakInheritanceList,
               FormatStyle::BILS_BeforeColon);
   // For backward compatibility:

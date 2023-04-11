@@ -4955,6 +4955,10 @@ bool TokenAnnotator::mustBreakBefore(const AnnotatedLine &Line,
       Right.is(TT_InheritanceComma)) {
     return true;
   }
+  if (Style.BreakInheritanceList == FormatStyle::BILS_BeforeEither &&
+      (Right.is(TT_InheritanceComma) || Right.is(TT_InheritanceColon))) {
+    return true;
+  }
   if (Style.BreakInheritanceList == FormatStyle::BILS_AfterComma &&
       Left.is(TT_InheritanceComma)) {
     return true;
@@ -5479,11 +5483,13 @@ bool TokenAnnotator::canBreakBefore(const AnnotatedLine &Line,
     return true;
   }
   if (Left.is(TT_InheritanceComma) &&
-      Style.BreakInheritanceList == FormatStyle::BILS_BeforeComma) {
+      (Style.BreakInheritanceList == FormatStyle::BILS_BeforeComma ||
+       Style.BreakInheritanceList == FormatStyle::BILS_BeforeEither)) {
     return false;
   }
   if (Right.is(TT_InheritanceComma) &&
-      Style.BreakInheritanceList == FormatStyle::BILS_BeforeComma) {
+      (Style.BreakInheritanceList == FormatStyle::BILS_BeforeComma ||
+       Style.BreakInheritanceList == FormatStyle::BILS_BeforeEither)) {
     return true;
   }
   if (Left.is(TT_ArrayInitializerLSquare))

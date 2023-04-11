@@ -25670,6 +25670,98 @@ TEST_F(FormatTest, ExtraSpaceFollowingConstructorInitializers) {
   verifyFormat(exp, input, Style);
 }
 
+TEST_F(FormatTest, BreakInheritanceListStyleWithShortNames) {
+  FormatStyle Style = getLLVMStyle();
+
+  char const *input = "class Foo : Base , Base2 {};\n"
+                      "class Bar : Base {};";
+  char const *expected;
+
+  Style.BreakInheritanceList = FormatStyle::BILS_BeforeColon;
+  expected = "class Foo : Base, Base2 {};\n"
+             "class Bar : Base {};";
+  verifyFormat(expected, input, Style);
+
+  Style.BreakInheritanceList = FormatStyle::BILS_BeforeComma;
+  expected = "class Foo\n"
+             "    : Base\n"
+             "    , Base2 {};\n"
+             "class Bar : Base {};";
+  verifyFormat(expected, input, Style);
+
+  Style.BreakInheritanceList = FormatStyle::BILS_AfterColon;
+  expected = "class Foo : Base, Base2 {};\n"
+             "class Bar : Base {};";
+  verifyFormat(expected, input, Style);
+
+  Style.BreakInheritanceList = FormatStyle::BILS_AfterComma;
+  expected = "class Foo : Base,\n"
+             "            Base2 {};\n"
+             "class Bar : Base {};";
+  verifyFormat(expected, input, Style);
+
+  Style.BreakInheritanceList = FormatStyle::BILS_BeforeEither;
+  expected = "class Foo\n"
+             "    : Base\n"
+             "    , Base2 {};\n"
+             "class Bar\n"
+             "    : Base {};";
+  verifyFormat(expected, input, Style);
+}
+
+TEST_F(FormatTest, BreakInheritanceListStyleWithLongNames) {
+  FormatStyle Style = getLLVMStyle();
+
+  char const *input =
+      "class AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA : BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB , "
+      "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC {};\n"
+      "class DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD : BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB "
+      "{};";
+  char const *expected;
+
+  Style.BreakInheritanceList = FormatStyle::BILS_BeforeColon;
+  expected =
+      "class AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA : BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB,\n"
+      "                                       CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC "
+      "{};\n"
+      "class DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD : BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB "
+      "{};";
+  verifyFormat(expected, input, Style);
+
+  Style.BreakInheritanceList = FormatStyle::BILS_BeforeComma;
+  expected = "class AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n"
+             "    : BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\n"
+             "    , CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC {};\n"
+             "class DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD : "
+             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB {};";
+  verifyFormat(expected, input, Style);
+
+  Style.BreakInheritanceList = FormatStyle::BILS_AfterColon;
+  expected = "class AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA :\n"
+             "    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB,\n"
+             "    CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC {};\n"
+             "class DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD : "
+             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB {};";
+  verifyFormat(expected, input, Style);
+
+  Style.BreakInheritanceList = FormatStyle::BILS_AfterComma;
+  expected =
+      "class AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA : BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB,\n"
+      "                                       CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC "
+      "{};\n"
+      "class DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD : BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB "
+      "{};";
+  verifyFormat(expected, input, Style);
+
+  Style.BreakInheritanceList = FormatStyle::BILS_BeforeEither;
+  expected = "class AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n"
+             "    : BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\n"
+             "    , CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC {};\n"
+             "class DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\n"
+             "    : BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB {};";
+  verifyFormat(expected, input, Style);
+}
+
 } // namespace
 } // namespace test
 } // namespace format
