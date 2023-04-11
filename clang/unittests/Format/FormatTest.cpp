@@ -16317,6 +16317,13 @@ TEST_F(FormatTest, ConfigurableSpaceBeforeParens) {
   verifyFormat("X A::operator++ ();", SpaceAfterOverloadedOperator);
   verifyFormat("some_object.operator++ ();", SpaceAfterOverloadedOperator);
   verifyFormat("auto func() -> int;", SpaceAfterOverloadedOperator);
+  verifyFormat("X A::operator< ();", SpaceAfterOverloadedOperator);
+  verifyFormat("X A::operator<< ();", SpaceAfterOverloadedOperator);
+  verifyFormat("X A::operator> ();", SpaceAfterOverloadedOperator);
+  verifyFormat("X A::operator>> ();", SpaceAfterOverloadedOperator);
+  verifyFormat("X *A::operator-> ();", SpaceAfterOverloadedOperator);
+  verifyFormat("X *A::operator->* ();", SpaceAfterOverloadedOperator);
+  verifyFormat("X A::operator, ();", SpaceAfterOverloadedOperator);
 
   SpaceAfterOverloadedOperator.SpaceBeforeParensOptions
       .AfterOverloadedOperator = false;
