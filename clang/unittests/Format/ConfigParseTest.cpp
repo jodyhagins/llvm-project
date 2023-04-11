@@ -192,6 +192,7 @@ TEST(ConfigParseTest, ParsesConfigurationBools) {
   CHECK_PARSE_BOOL(SpaceBeforeCtorInitializerColon);
   CHECK_PARSE_BOOL(SpaceBeforeInheritanceColon);
   CHECK_PARSE_BOOL(SpaceBeforeJsonColon);
+  CHECK_PARSE_BOOL(SpaceBeforeOverloadedOperator);
   CHECK_PARSE_BOOL(SpaceBeforeRangeBasedForLoopColon);
   CHECK_PARSE_BOOL(SpaceBeforeSquareBrackets);
   CHECK_PARSE_BOOL(VerilogBreakBetweenInstancePorts);

@@ -25576,6 +25576,30 @@ TEST_F(FormatTest, SpaceAfterUDL) {
   verifyFormat("auto x = 5s .count() == 5;");
 }
 
+TEST_F(FormatTest, SpaceBeforeOverloadedOperator) {
+  FormatStyle Style = getLLVMStyle();
+
+  verifyFormat("auto operator++() -> int;", Style);
+  verifyFormat("X A::operator++();", Style);
+  verifyFormat("some_object.operator++();", Style);
+
+  Style.SpaceBeforeOverloadedOperator = true;
+  verifyFormat("auto operator ++() -> int;", Style);
+  verifyFormat("X A::operator ++();", Style);
+  verifyFormat("some_object.operator ++();", Style);
+
+  Style.SpaceBeforeParens = FormatStyle::SBPO_Custom;
+  Style.SpaceBeforeParensOptions.AfterOverloadedOperator = false;
+  verifyFormat("auto operator ++() -> int;", Style);
+  verifyFormat("X A::operator ++();", Style);
+  verifyFormat("some_object.operator ++();", Style);
+
+  Style.SpaceBeforeParensOptions.AfterOverloadedOperator = true;
+  verifyFormat("auto operator ++ () -> int;", Style);
+  verifyFormat("X A::operator ++ ();", Style);
+  verifyFormat("some_object.operator ++ ();", Style);
+}
+
 } // namespace
 } // namespace test
 } // namespace format
