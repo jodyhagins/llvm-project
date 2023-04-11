@@ -1969,6 +1969,18 @@ struct FormatStyle {
     ///    {};
     /// \endcode
     BILS_AfterComma,
+    /// Break inheritance list before either the colon or the commma,
+    /// which will break even for single inheritance.
+    /// \code
+    ///    class Foo
+    ///        : Base
+    ///        , Base2
+    ///    {};
+    ///    class Bar
+    ///        : Base
+    ///    {};
+    /// \endcode
+    BILS_BeforeEither,
   };
 
   /// The inheritance list style to use.

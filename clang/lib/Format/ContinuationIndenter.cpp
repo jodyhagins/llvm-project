@@ -135,7 +135,8 @@ static bool startsNextParameter(const FormatToken &Current,
            Style.BreakConstructorInitializers !=
                FormatStyle::BCIS_BeforeComma) &&
           (Previous.isNot(TT_InheritanceComma) ||
-           Style.BreakInheritanceList != FormatStyle::BILS_BeforeComma));
+           (Style.BreakInheritanceList != FormatStyle::BILS_BeforeComma &&
+            Style.BreakInheritanceList != FormatStyle::BILS_BeforeEither)));
 }
 
 static bool opensProtoMessageField(const FormatToken &LessTok,
