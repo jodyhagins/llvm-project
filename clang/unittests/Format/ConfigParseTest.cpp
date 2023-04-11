@@ -748,6 +748,13 @@ TEST(ConfigParseTest, ParsesConfiguration) {
   CustomIfs.push_back("MYIF");
   CHECK_PARSE("IfMacros: [MYIF]", IfMacros, CustomIfs);
 
+  Style.AnonymousNamespaceText.clear();
+  CHECK_PARSE("AnonymousNamespaceText: anonymous", AnonymousNamespaceText,
+              "anonymous");
+  Style.AnonymousNamespaceText.clear();
+  CHECK_PARSE("AnonymousNamespaceText: unnamed namespace",
+              AnonymousNamespaceText, "unnamed namespace");
+
   Style.AttributeMacros.clear();
   CHECK_PARSE("BasedOnStyle: LLVM", AttributeMacros,
               std::vector<std::string>{"__capability"});

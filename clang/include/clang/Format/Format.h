@@ -862,6 +862,10 @@ struct FormatStyle {
   /// \version 3.4
   BreakTemplateDeclarationsStyle AlwaysBreakTemplateDeclarations;
 
+  /// The text to use for the anonymous namespace, when the namespace name is
+  /// appended to the ending brace of an anonymous/unnamed namespace
+  std::string AnonymousNamespaceText;
+
   /// A vector of strings that should be interpreted as attributes/qualifiers
   /// instead of identifiers. This can be useful for language extensions or
   /// static analyzer annotations.
@@ -4292,6 +4296,7 @@ struct FormatStyle {
                R.AlwaysBreakBeforeMultilineStrings &&
            AlwaysBreakTemplateDeclarations ==
                R.AlwaysBreakTemplateDeclarations &&
+           AnonymousNamespaceText == R.AnonymousNamespaceText &&
            AttributeMacros == R.AttributeMacros &&
            BinPackArguments == R.BinPackArguments &&
            BinPackParameters == R.BinPackParameters &&

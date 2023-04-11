@@ -875,6 +875,7 @@ template <> struct MappingTraits<FormatStyle> {
                    Style.AlwaysBreakBeforeMultilineStrings);
     IO.mapOptional("AlwaysBreakTemplateDeclarations",
                    Style.AlwaysBreakTemplateDeclarations);
+    IO.mapOptional("AnonymousNamespaceText", Style.AnonymousNamespaceText);
     IO.mapOptional("AttributeMacros", Style.AttributeMacros);
     IO.mapOptional("BinPackArguments", Style.BinPackArguments);
     IO.mapOptional("BinPackParameters", Style.BinPackParameters);
@@ -1334,6 +1335,7 @@ FormatStyle getLLVMStyle(FormatStyle::LanguageKind Language) {
   LLVMStyle.AlwaysBreakAfterDefinitionReturnType = FormatStyle::DRTBS_None;
   LLVMStyle.AlwaysBreakBeforeMultilineStrings = false;
   LLVMStyle.AlwaysBreakTemplateDeclarations = FormatStyle::BTDS_MultiLine;
+  LLVMStyle.AnonymousNamespaceText = "";
   LLVMStyle.AttributeMacros.push_back("__capability");
   LLVMStyle.BitFieldColonSpacing = FormatStyle::BFCS_Both;
   LLVMStyle.BinPackArguments = true;

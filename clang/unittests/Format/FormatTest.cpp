@@ -75,6 +75,47 @@ TEST_F(FormatTest, NestedNameSpecifiers) {
   verifyFormat("some::string getName();");
 }
 
+TEST_F(FormatTest, AnonymousNamespaceText) {
+  FormatStyle Style = getLLVMStyle();
+
+  verifyFormat("namespace {\n"
+               "void do_1();\n"
+               "void do_2();\n"
+               "void do_3();\n"
+               "void do_4();\n"
+               "void do_5();\n"
+               "void do_6();\n"
+               "} // namespace",
+               "namespace {\n"
+               "void do_1();\n"
+               "void do_2();\n"
+               "void do_3();\n"
+               "void do_4();\n"
+               "void do_5();\n"
+               "void do_6();\n"
+               "}",
+               Style);
+
+  Style.AnonymousNamespaceText = "blarg blip";
+  verifyFormat("namespace {\n"
+               "void do_1();\n"
+               "void do_2();\n"
+               "void do_3();\n"
+               "void do_4();\n"
+               "void do_5();\n"
+               "void do_6();\n"
+               "} // blarg blip",
+               "namespace {\n"
+               "void do_1();\n"
+               "void do_2();\n"
+               "void do_3();\n"
+               "void do_4();\n"
+               "void do_5();\n"
+               "void do_6();\n"
+               "}",
+               Style);
+}
+
 TEST_F(FormatTest, OnlyGeneratesNecessaryReplacements) {
   EXPECT_EQ("if (a) {\n"
             "  f();\n"
