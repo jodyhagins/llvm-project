@@ -1093,6 +1093,14 @@ unsigned ContinuationIndenter::getNewLineColumn(const LineState &State) {
   FormatToken &Current = *State.NextToken;
   const auto &CurrentState = State.Stack.back();
 
+  if (Current.is(TT_TrailingReturnArrow) &&
+      Style.BreakBeforeTrailingReturnArrow) {
+    if (State.Stack.size() > 0)
+      return State.Stack[State.Stack.size() - 1].LastSpace;
+    else
+      return 0;
+  }
+
   if (CurrentState.IsCSharpGenericTypeConstraint &&
       Current.isNot(TT_CSharpGenericTypeConstraint)) {
     return CurrentState.ColonPos + 2;

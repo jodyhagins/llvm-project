@@ -8851,6 +8851,36 @@ TEST_F(FormatTest, ParenthesesAndOperandAlignment) {
                Style);
 }
 
+TEST_F(FormatTest, BreakBeforeTrailingReturnArrow) {
+  FormatStyle Style = getLLVMStyle();
+
+  char const *input = "auto foo(T const & t) -> decltype(t.foo())\n"
+                      "{ return t.foo(); }";
+  char const *expected = "auto foo(T const &t) -> decltype(t.foo()) "
+                         "{ return t.foo(); }";
+  verifyFormat(expected, input, Style);
+
+  Style.BreakBeforeTrailingReturnArrow = true;
+  expected = "auto foo(T const &t)\n"
+             "-> decltype(t.foo()) {\n"
+             "  return t.foo();\n"
+             "}";
+  verifyFormat(expected, input, Style);
+}
+
+TEST_F(FormatTest, BreakBeforeTrailingReturnArrowLeavesLambdaAlone) {
+  FormatStyle Style = getLLVMStyle();
+
+  char const *input = "auto foo = [](auto const & t) -> decltype(t.foo())\n"
+                      "{ return t.foo(); };";
+  char const *expected = "auto foo = [](auto const &t) -> decltype(t.foo()) "
+                         "{ return t.foo(); };";
+  verifyFormat(expected, input, Style);
+
+  Style.BreakBeforeTrailingReturnArrow = true;
+  verifyFormat(expected, input, Style);
+}
+
 TEST_F(FormatTest, BreaksConditionalExpressions) {
   verifyFormat(
       "aaaa(aaaaaaaaaaaaaaaaaaaa, aaaaaaaaaaaaaaaaaaaaaaaaaa\n"

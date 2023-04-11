@@ -4815,6 +4815,10 @@ bool TokenAnnotator::mustBreakBefore(const AnnotatedLine &Line,
              Style.Language == FormatStyle::LK_TextProto) {
     if (Left.isStringLiteral() && Right.isStringLiteral())
       return true;
+    if (Right.is(TT_TrailingReturnArrow) &&
+        Style.BreakBeforeTrailingReturnArrow) {
+      return true;
+    }
   }
 
   // Basic JSON newline processing.
