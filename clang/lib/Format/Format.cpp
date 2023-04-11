@@ -1018,6 +1018,8 @@ template <> struct MappingTraits<FormatStyle> {
     IO.mapOptional("SpaceBeforeInheritanceColon",
                    Style.SpaceBeforeInheritanceColon);
     IO.mapOptional("SpaceBeforeJsonColon", Style.SpaceBeforeJsonColon);
+    IO.mapOptional("SpaceBeforeOverloadedOperator",
+                   Style.SpaceBeforeOverloadedOperator);
     IO.mapOptional("SpaceBeforeParens", Style.SpaceBeforeParens);
     IO.mapOptional("SpaceBeforeParensOptions", Style.SpaceBeforeParensOptions);
     IO.mapOptional("SpaceBeforeRangeBasedForLoopColon",
@@ -1450,6 +1452,7 @@ FormatStyle getLLVMStyle(FormatStyle::LanguageKind Language) {
   LLVMStyle.SpaceBeforeCtorInitializerColon = true;
   LLVMStyle.SpaceBeforeInheritanceColon = true;
   LLVMStyle.SpaceBeforeJsonColon = false;
+  LLVMStyle.SpaceBeforeOverloadedOperator = false;
   LLVMStyle.SpaceBeforeParens = FormatStyle::SBPO_ControlStatements;
   LLVMStyle.SpaceBeforeParensOptions = {};
   LLVMStyle.SpaceBeforeParensOptions.AfterControlStatements = true;

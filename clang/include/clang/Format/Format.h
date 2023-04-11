@@ -3800,6 +3800,19 @@ struct FormatStyle {
   /// \version 17
   bool SpaceBeforeJsonColon;
 
+  /// If ``true``, a space will be added before an overloaded operator.
+  ///
+  /// \code
+  ///    true:                                  false:
+  ///    void operator ++(int a);        vs.    void operator++(int a);
+  ///    object.operator ++(10);                object.operator++(10);
+  /// \endcode
+  ///
+  /// If both SpaceBeforeOverloadedOperator and AfterOverloadedOperator.
+  /// AfterOverloadedOperator are true, then a space will be inserted both
+  /// in front and after the operator.
+  bool SpaceBeforeOverloadedOperator;
+
   /// Different ways to put a space before opening parentheses.
   enum SpaceBeforeParensStyle : int8_t {
     /// Never put a space before opening parentheses.
@@ -4425,6 +4438,7 @@ struct FormatStyle {
                R.SpaceBeforeCtorInitializerColon &&
            SpaceBeforeInheritanceColon == R.SpaceBeforeInheritanceColon &&
            SpaceBeforeJsonColon == R.SpaceBeforeJsonColon &&
+           SpaceBeforeOverloadedOperator == R.SpaceBeforeOverloadedOperator &&
            SpaceBeforeParens == R.SpaceBeforeParens &&
            SpaceBeforeParensOptions == R.SpaceBeforeParensOptions &&
            SpaceAroundPointerQualifiers == R.SpaceAroundPointerQualifiers &&

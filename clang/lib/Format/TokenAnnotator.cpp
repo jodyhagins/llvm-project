@@ -4170,7 +4170,9 @@ bool TokenAnnotator::spaceRequiredBefore(const AnnotatedLine &Line,
       return true;
 
     if (Left.is(tok::kw_operator))
-      return Right.is(tok::coloncolon);
+      return Right.is(tok::coloncolon) ||
+             (Style.SpaceBeforeOverloadedOperator &&
+              Right.is(TT_OverloadedOperator));
     if (Right.is(tok::l_brace) && Right.is(BK_BracedInit) &&
         !Left.opensScope() && Style.SpaceBeforeCpp11BracedList) {
       return true;
