@@ -4603,6 +4603,11 @@ bool TokenAnnotator::spaceRequiredBefore(const AnnotatedLine &Line,
   if (Right.isOneOf(tok::arrow, tok::arrowstar, tok::periodstar) ||
       Left.isOneOf(tok::arrow, tok::period, tok::arrowstar, tok::periodstar) ||
       (Right.is(tok::period) && Right.isNot(TT_DesignatedInitializerPeriod))) {
+    if (Left.is(TT_OverloadedOperator) &&
+        Right.is(TT_OverloadedOperatorLParen) &&
+        Style.SpaceBeforeParensOptions.AfterOverloadedOperator) {
+      return true;
+    }
     return false;
   }
   if (!Style.SpaceBeforeAssignmentOperators && Left.isNot(TT_TemplateCloser) &&
