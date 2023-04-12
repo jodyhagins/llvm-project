@@ -901,6 +901,8 @@ template <> struct MappingTraits<FormatStyle> {
                    Style.BreakBeforeInlineASMColon);
     IO.mapOptional("BreakBeforeTernaryOperators",
                    Style.BreakBeforeTernaryOperators);
+    IO.mapOptional("BreakBeforeQualifiedFunction",
+                   Style.BreakBeforeQualifiedFunction);
     IO.mapOptional("BreakBeforeTrailingReturnArrow",
                    Style.BreakBeforeTrailingReturnArrow);
     IO.mapOptional("BreakConstructorInitializers",
@@ -1380,6 +1382,7 @@ FormatStyle getLLVMStyle(FormatStyle::LanguageKind Language) {
   LLVMStyle.BreakBeforeConceptDeclarations = FormatStyle::BBCDS_Always;
   LLVMStyle.BreakBeforeInlineASMColon = FormatStyle::BBIAS_OnlyMultiline;
   LLVMStyle.BreakBeforeTernaryOperators = true;
+  LLVMStyle.BreakBeforeQualifiedFunction = false;
   LLVMStyle.BreakBeforeTrailingReturnArrow = false;
   LLVMStyle.BreakConstructorInitializers = FormatStyle::BCIS_BeforeColon;
   LLVMStyle.BreakInheritanceList = FormatStyle::BILS_BeforeColon;

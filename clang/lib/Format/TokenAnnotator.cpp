@@ -1078,7 +1078,7 @@ private:
             break;
           if (PrevPrev && PrevPrev->isOneOf(tok::r_paren, tok::kw_noexcept))
             Tok->setType(TT_CtorInitializerColon);
-        } else {
+        } else if (!Style.isCpp() || !Prev->isAccessSpecifier(Style.isCpp())) {
           Tok->setType(TT_InheritanceColon);
         }
       } else if (canBeObjCSelectorComponent(*Tok->Previous) && Tok->Next &&
@@ -3252,6 +3252,94 @@ static bool mustBreakAfterAttributes(const FormatToken &Tok,
   }
 }
 
+static void qualifiedFunctions(const FormatStyle &Style, AnnotatedLine &Line,
+                               FormatToken *Current) {
+  if (Current->is(TT_FunctionDeclarationName)) {
+    FormatToken *Found = nullptr;
+    for (FormatToken *Tok = Current->getNextNonComment(); Tok;) {
+      if (Tok->is(tok::coloncolon)) {
+        if ((Tok = Tok->getNextNonComment())) {
+          if (Tok->is(tok::identifier))
+            Found = Tok;
+          Tok = Tok->getNextNonComment();
+        }
+      } else if (Tok->is(TT_TemplateOpener)) {
+        while ((Tok = Tok->getNextNonComment())) {
+          if (Tok->is(TT_TemplateCloser)) {
+            Tok = Tok->getNextNonComment();
+            break;
+          }
+        }
+      } else {
+        break;
+      }
+    }
+    if (Found) {
+      Found->setType(TT_QualifiedFunctionDeclarationName);
+      Found->MustBreakBefore =
+          Found->MustBreakBefore || Style.BreakBeforeQualifiedFunction;
+    }
+  }
+}
+
+static void qualifiedSpecialMembers(const FormatStyle &Style,
+                                    AnnotatedLine &Line, FormatToken *Current) {
+  if (Current->is(tok::identifier)) {
+    FormatToken *Tok = Current->getNextNonComment();
+    if (Tok && Tok->is(tok::l_paren)) {
+      FormatToken *TokenToChange = Current;
+      Tok = Current->getPreviousNonComment();
+      if (Tok && Tok->is(tok::tilde)) {
+        TokenToChange = Tok;
+        Tok = Tok->getPreviousNonComment();
+      }
+      if (Tok && Tok->is(tok::coloncolon)) {
+        Tok = Tok->getPreviousNonComment();
+        if (Tok && Tok->is(TT_TemplateCloser)) {
+          while (Tok && !Tok->is(TT_TemplateOpener))
+            Tok = Tok->getPreviousNonComment();
+          if (Tok)
+            Tok = Tok->getPreviousNonComment();
+        }
+        if (Tok && Tok->is(tok::identifier)) {
+          if (Tok->TokenText == Current->TokenText) {
+            TokenToChange->setType(TT_QualifiedFunctionDeclarationName);
+            TokenToChange->MustBreakBefore = TokenToChange->MustBreakBefore ||
+                                             Style.BreakBeforeQualifiedFunction;
+          }
+        }
+      }
+    }
+  }
+}
+
+static void otherFunctions(const FormatStyle &Style, AnnotatedLine &Line,
+                           FormatToken *Current) {
+  if (Line.MightBeFunctionDecl && Current->is(tok::kw_operator)) {
+    FormatToken *Tok = Current->getPreviousNonComment();
+    if (Tok && Tok->is(tok::coloncolon)) {
+      Tok = Current->getNextNonComment();
+      if (Tok && Tok->isOneOf(TT_OverloadedOperator, TT_Unknown)) {
+        while (Tok && Tok->isOneOf(TT_OverloadedOperator, TT_Unknown))
+          Tok = Tok->getNextNonComment();
+        if (Tok && Tok->is(TT_OverloadedOperatorLParen)) {
+          Current->setType(TT_QualifiedFunctionDeclarationName);
+          Current->MustBreakBefore =
+              Current->MustBreakBefore || Style.BreakBeforeQualifiedFunction;
+        }
+      }
+    }
+  }
+}
+
+static void qualifiedFunctionDeclarations(const FormatStyle &Style,
+                                          AnnotatedLine &Line,
+                                          FormatToken *Current) {
+  qualifiedFunctions(Style, Line, Current);
+  qualifiedSpecialMembers(Style, Line, Current);
+  otherFunctions(Style, Line, Current);
+}
+
 void TokenAnnotator::calculateFormattingInformation(AnnotatedLine &Line) const {
   for (AnnotatedLine *ChildLine : Line.Children)
     calculateFormattingInformation(*ChildLine);
@@ -3284,6 +3372,7 @@ void TokenAnnotator::calculateFormattingInformation(AnnotatedLine &Line) const {
 
   while (Current) {
     const FormatToken *Prev = Current->Previous;
+    qualifiedFunctionDeclarations(Style, Line, Current);
     if (Current->is(TT_LineComment)) {
       if (Prev->is(BK_BracedInit) && Prev->opensScope()) {
         Current->SpacesRequiredBefore =
