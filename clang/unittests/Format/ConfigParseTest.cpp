@@ -154,6 +154,7 @@ TEST(ConfigParseTest, ParsesConfigurationBools) {
   CHECK_PARSE_BOOL(BinPackParameters);
   CHECK_PARSE_BOOL(BreakAfterJavaFieldAnnotations);
   CHECK_PARSE_BOOL(BreakBeforeTernaryOperators);
+  CHECK_PARSE_BOOL(BreakBeforeQualifiedFunction);
   CHECK_PARSE_BOOL(BreakBeforeTrailingReturnArrow);
   CHECK_PARSE_BOOL(BreakStringLiterals);
   CHECK_PARSE_BOOL(CompactNamespaces);

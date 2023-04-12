@@ -350,6 +350,11 @@ bool ContinuationIndenter::mustBreak(const LineState &State) {
   const FormatToken &Current = *State.NextToken;
   const FormatToken &Previous = *Current.Previous;
   const auto &CurrentState = State.Stack.back();
+  if (Style.BreakBeforeQualifiedFunction &&
+      Current.is(TT_QualifiedFunctionDeclarationName)) {
+    return true;
+  }
+
   if (Style.BraceWrapping.BeforeLambdaBody && Current.CanBreakBefore &&
       Current.is(TT_LambdaLBrace) && Previous.isNot(TT_LineComment)) {
     auto LambdaBodyLength = getLengthToMatchingParen(Current, State.Stack);
@@ -1104,6 +1109,11 @@ unsigned ContinuationIndenter::getNewLineColumn(const LineState &State) {
       return State.Stack[State.Stack.size() - 1].LastSpace;
     else
       return 0;
+  }
+
+  if (Current.is(TT_QualifiedFunctionDeclarationName) &&
+      Style.BreakBeforeQualifiedFunction && !Style.IndentWrappedFunctionNames) {
+    return 0;
   }
 
   if (CurrentState.IsCSharpGenericTypeConstraint &&

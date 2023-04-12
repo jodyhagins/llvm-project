@@ -25762,6 +25762,49 @@ TEST_F(FormatTest, BreakInheritanceListStyleWithLongNames) {
   verifyFormat(expected, input, Style);
 }
 
+TEST_F(FormatTest, BreakBeforeQualifiedFunction) {
+  FormatStyle Style = getLLVMStyle();
+  Style.BreakBeforeQualifiedFunction = true;
+
+  char const *input, *expected;
+
+  input = "void A<int>::g3<char>(int, char) {}";
+  expected = "void A<int>::\n"
+             "g3<char>(int, char) {}";
+  verifyFormat(expected, input, Style);
+
+  input = "Blarg::Blarg() {}";
+  expected = "Blarg::\nBlarg() {}";
+  verifyFormat(expected, input, Style);
+
+  input = "Blarg::~Blarg() {}";
+  expected = "Blarg::\n~Blarg() {}";
+  verifyFormat(expected, input, Style);
+
+  input = "template <typename... Ts> Blarg<Ts...>::"
+          "~Blarg() { Blarg::Deinit(); }";
+  expected = "template <typename... Ts> Blarg<Ts...>::\n"
+             "~Blarg() { Blarg::Deinit(); }";
+  verifyFormat(expected, input, Style);
+
+  input = "std::size_t Hash::"
+          "operator()(const Something &something) const noexcept {\n"
+          "  return do_hash(something.foo());\n"
+          "}";
+  expected = "std::size_t Hash::\n"
+             "operator()(const Something &something) const noexcept {\n"
+             "  return do_hash(something.foo());\n"
+             "}";
+  verifyFormat(expected, input, Style);
+
+  input = "Foo::operator int *() const { return nullptr; }";
+  expected = "Foo::\n"
+             "operator int *() const {\n"
+             "  return nullptr;\n"
+             "}";
+  verifyFormat(expected, input, Style);
+}
+
 } // namespace
 } // namespace test
 } // namespace format

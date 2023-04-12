@@ -1834,6 +1834,60 @@ struct FormatStyle {
   /// \version 16
   BreakBeforeInlineASMColonStyle BreakBeforeInlineASMColon;
 
+  /// If ``true``, will insert a line before a qualified function declaration.
+  /// \code
+  ///    false:
+  ///    void A<int>::g3<char>(int, char) {}
+  ///
+  ///    true:
+  ///    void A<int>::
+  ///    g3<char>(int, char) {}
+  ///
+  ///    false:
+  ///    Blarg::Blarg() {}
+  ///
+  ///    true:
+  ///    Blarg::
+  ///    Blarg() {}
+  ///
+  ///    false:
+  ///    Blarg::~Blarg() {}
+  ///
+  ///    true:
+  ///    Blarg::
+  ///    ~Blarg() {}"
+  ///
+  ///    false:
+  ///    template <typename... Ts> Blarg<Ts...>::~Blarg() { }
+  ///
+  ///    true:
+  ///    template <typename... Ts> Blarg<Ts...>::
+  ///    ~Blarg() { };
+  ///
+  ///    false:
+  ///    std::size_t Hash::operator()(const Something &something) const noexcept
+  ///    {
+  ///      return do_hash(something.foo());
+  ///    }
+  ///
+  ///    true:
+  ///    std::size_t Hash::
+  ///    operator()(const Something &something) const noexcept {
+  ///      return do_hash(something.foo());
+  ///    }
+  ///
+  ///    false:
+  ///    Foo::operator int *() const { return nullptr; }
+  ///
+  ///    true:
+  ///    Foo::
+  ///    operator int *() const {
+  ///      return nullptr;
+  ///    }
+  ///
+  /// \endcode
+  bool BreakBeforeQualifiedFunction;
+
   /// If ``true``, ternary operators will be placed after line breaks.
   /// \code
   ///    true:
@@ -4411,6 +4465,7 @@ struct FormatStyle {
            BreakBeforeConceptDeclarations == R.BreakBeforeConceptDeclarations &&
            BreakBeforeInlineASMColon == R.BreakBeforeInlineASMColon &&
            BreakBeforeTernaryOperators == R.BreakBeforeTernaryOperators &&
+           BreakBeforeQualifiedFunction == R.BreakBeforeQualifiedFunction &&
            BreakBeforeTrailingReturnArrow == R.BreakBeforeTrailingReturnArrow &&
            BreakConstructorInitializers == R.BreakConstructorInitializers &&
            BreakInheritanceList == R.BreakInheritanceList &&
