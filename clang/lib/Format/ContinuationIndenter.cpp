@@ -1206,8 +1206,13 @@ unsigned ContinuationIndenter::getNewLineColumn(const LineState &State) {
   }
   if (NextNonComment->isStringLiteral() && State.StartOfStringLiteral != 0)
     return State.StartOfStringLiteral;
-  if (NextNonComment->is(tok::lessless) && CurrentState.FirstLessLess != 0)
-    return CurrentState.FirstLessLess;
+  if (NextNonComment->is(tok::lessless) && CurrentState.FirstLessLess != 0) {
+    if (Style.AlignOperands == FormatStyle::OAS_DontAlign) {
+      return CurrentState.Indent;
+    } else {
+      return CurrentState.FirstLessLess;
+    }
+  }
   if (NextNonComment->isMemberAccess()) {
     if (CurrentState.CallContinuation == 0)
       return ContinuationIndent;
