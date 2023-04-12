@@ -7024,6 +7024,21 @@ TEST_F(FormatTest, NoOperandAlignment) {
                "               aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa +\n"
                "                   aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa);",
                Style);
+  verifyFormat("{\n"
+               "  std::cout << Lorem << ipsum << dolor << sit << amet << "
+               "consectetur\n"
+               "      << adipiscing << elit << sed << do << eiusmod << "
+               "tempor << incididunt\n"
+               "      << ut << labore << et << dolore << magna << aliqua << "
+               "Ut << enim\n"
+               "      << ad minim << veniam << quis << nostrud << "
+               "exercitation << ullamco\n"
+               "      << laboris << nisi << ut << aliquip << ex << ea << "
+               "commodo << consequat\n"
+               "      << std::endl;\n"
+               "}",
+               Style);
+
   Style.BreakBeforeBinaryOperators = FormatStyle::BOS_NonAssignment;
   verifyFormat("bool value = aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
                "            + aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
@@ -7044,6 +7059,7 @@ TEST_F(FormatTest, NoOperandAlignment) {
                "    + bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n"
                "        * cccccccccccccccccccccccccccccccccccc;\n",
                Style);
+
 
   Style.AlignAfterOpenBracket = FormatStyle::BAS_DontAlign;
   verifyFormat("return (a > b\n"
